@@ -245,9 +245,9 @@ jobs:
     docker: 
       - image: amazon/aws-cli:latest
     steps:
-      - checkout
-      - setup_aws
-      - install-tar-utility
+      # - checkout
+      # - setup_aws
+      # - install-tar-utility
       - run:
           name: Ensure back-end infrastructure exists
           command: |
