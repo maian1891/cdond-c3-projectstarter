@@ -75,10 +75,6 @@ commands:
                 }
               ]
             }
-
-  slack_notification_succeeded:
-    description: "A succeeded slack notification"
-    steps:
       - slack/notify:
           event: pass
           custom: |
@@ -166,7 +162,6 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-build
       - slack_notification
-      - slack_notification_succeeded
 
   build-backend:
     docker:
@@ -185,7 +180,6 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
       - slack_notification
-      - slack_notification_succeeded
 
   test-frontend:
     docker:
@@ -201,7 +195,6 @@ jobs:
             npm install
             npm run test
       - slack_notification
-      - slack_notification_succeeded
 
   test-backend:
     docker:
@@ -217,7 +210,6 @@ jobs:
             npm install
             npm run test
       - slack_notification
-      - slack_notification_succeeded
 
   scan-frontend:
     docker:
@@ -248,7 +240,6 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
       - slack_notification
-      - slack_notification_succeeded
 
 workflows:
   default:
