@@ -223,7 +223,7 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical --force
       - slack_notification
 
   scan-backend:
@@ -238,7 +238,7 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical --force
       - slack_notification
 
 workflows:
