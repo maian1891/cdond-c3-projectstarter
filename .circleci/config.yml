@@ -183,12 +183,16 @@ commands:
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      workflow_id:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID}
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            export KVDB_URL=https://kvdb.io/V1bG8TqUYay8mW8UfhNS13/migration_"${CIRCLE_WORKFLOW_ID:0:7}"
+            export KVDB_URL=https://kvdb.io/V1bG8TqUYay8mW8UfhNS13/migration_<<parameters.workflow_id>>
             echo $KVDB_URL
             export SUCCESS=$(curl --insecure $KVDB_URL | tail -n 1)
             if(( $SUCCESS==0 ));
@@ -207,13 +211,17 @@ commands:
 
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      workflow_id:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID}
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-            aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws cloudformation delete-stack --stack-name "udapeople-backend-<<parameters.workflow_id>>"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-<<parameters.workflow_id>>"
 
   clean-s3:
     description: Clean all s3 files
@@ -353,7 +361,8 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - slack_notification
 
   configure-infrastructure:
@@ -371,14 +380,15 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
+            apk add --update --no-cache tar gzip ansible
             apk add curl
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - slack_notification
 
   run-migrations:
@@ -404,7 +414,8 @@ jobs:
               echo https://kvdb.io/V1bG8TqUYay8mW8UfhNS13/migration_"${CIRCLE_WORKFLOW_ID:0:7}"
               curl https://kvdb.io/V1bG8TqUYay8mW8UfhNS13/migration_"${CIRCLE_WORKFLOW_ID:0:7}" -d '1'
             fi
-      - revert-migrations
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - slack_notification
 
   deploy-frontend:
@@ -433,7 +444,8 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
-      - destroy-environment
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - clean-s3
       - slack_notification
 
@@ -463,7 +475,8 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - slack_notification
 
   smoke-test:
@@ -495,9 +508,11 @@ jobs:
             else
               exit 1
             fi
-      - revert-migrations
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - clean-s3
-      - destroy-environment
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - slack_notification
 
 workflows:
@@ -515,9 +530,9 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [master]
+          # filters:
+          #   branches:
+          #     only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
