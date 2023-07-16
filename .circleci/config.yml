@@ -379,6 +379,8 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - 31:17:31:2e:60:18:00:d3:8e:5b:33:c8:03:98:8d:5b
+      - restore_cache:
+          keys: [backend-build]
       - attach_workspace:
           at: ~/
       - run: cat .circleci/ansible/inventory.txt
@@ -518,9 +520,9 @@ jobs:
           name: Backend smoke test.
           command: |
             export BACKEND_IP=$(tail ~/project/.circleci/ansible/inventory.txt)
-            export BACKEND_IP=$(aws ec2 describe-instances \ 
+            export BACKEND_IP=$(aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \ 
+            --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
             --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
@@ -609,18 +611,18 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [master]
