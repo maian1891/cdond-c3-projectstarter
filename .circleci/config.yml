@@ -82,8 +82,8 @@ commands:
               ]
             }
 
-  slack_notification_successed:
-    description: "A slack notification successed"
+  slack_notification_succeeded:
+    description: "A slack notification succeeded"
     steps:
       - slack/notify:
           event: pass
