@@ -76,7 +76,7 @@ commands:
                 }
               ]
             }
-  
+
   slack_notification_successed:
     description: "A slack notification successed"
     steps:
@@ -183,9 +183,6 @@ commands:
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      workflow_id:
-        type: string 
     steps:
       - run:
           name: Revert migrations
@@ -210,9 +207,6 @@ commands:
 
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      workflow_id:
-        type: string 
     steps:
       - run:
           name: Destroy environments
@@ -220,7 +214,7 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-  
+
   clean-s3:
     description: Clean all s3 files
     steps:
@@ -327,7 +321,7 @@ jobs:
       - slack_notification
 
   deploy-infrastructure:
-    docker: 
+    docker:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
