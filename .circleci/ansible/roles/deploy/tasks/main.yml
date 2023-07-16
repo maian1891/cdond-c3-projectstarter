@@ -1,23 +1,20 @@
 ---
-- name: Creates directory
+- name: Create directory
   file:
-    path: ~/
+    path: /home/ubuntu/backend
     state: directory
-    mode: 0755
 
-- name: Unarchive artifact
+- name: Copy compressed backend folder
   unarchive:
-    remote_src: yes
-    src: ../../artifact.tar.gz
-    dest: ~/
+    src: ~/project/artifact.tar.gz
+    dest: /home/ubuntu/backend
+    owner: ubuntu
 
-- name: Copy env file
-  shell: cp /tmp/.env /home/ubuntu/project
-
-- name: Start app
-  shell: |
-    npm install
-    npm i -g pm2
-    npm run build
-    pm2 stop default
-    pm2 start npm -- start --wait-ready
+- name: Run the web server
+  shell:
+    cmd: |
+      npm install
+      cd /home/ubuntu/backend
+      pm2 stop backend
+      pm2 delete backend
+      pm2 start npm -- start

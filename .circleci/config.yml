@@ -420,22 +420,28 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - install-awscli
-      - attach_workspace:
-          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar
+            apk add gzip
+            apk add nodejs
+            apk add npm
+            apk add curl
+            pip3 install awscli
+      - restore_cache:
+          keys: [frontend-build]
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
-      - restore_cache:
-          keys: [frontend-build]
       - run:
           name: Deploy frontend objects
           command: |
@@ -443,14 +449,15 @@ jobs:
             npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - clean-s3
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert_migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.16
     steps:
       - checkout
       - install-awscli-alpine-based
@@ -463,17 +470,22 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
-            apk add curl
+            apk add --update --no-cache tar gzip nodejs npm ansible curl
       - restore_cache:
           keys: [backend-build]
       - run:
           name: Deploy backend
           command: |
+            cd backend
+            npm install
+            npm run build
+            cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
