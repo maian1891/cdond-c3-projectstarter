@@ -1,5 +1,5 @@
 GitHub [url01]: https://github.com/maian1891/cdond-c3-projectstarter
-S3 Bucket [url02]: 
-CloudFront distribution [url03]:
-Back-end in EC2 [URL04]:
-Prometheus Server [URL05]:
+S3 Bucket [url02]: http://udapeople-014ed9e.s3-website-us-east-1.amazonaws.com
+CloudFront distribution [url03]: http://d3n5udk53jki29.cloudfront.net/
+Back-end in EC2 [URL04]: http://44.204.44.35:3030/
+Prometheus Server [URL05]: http://ec2-3-83-174-142.compute-1.amazonaws.com:9090/targets
