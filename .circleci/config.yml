@@ -344,6 +344,11 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \ 
+            --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
+      - run:
           name: Ensure prometheus infrastructure exist
           command: |
             aws cloudformation deploy \
@@ -352,11 +357,6 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides AuthEmail=$GmailAddress EmailPassword=$GmailPassword FromEmail=$GmailAddress ToEmail=$EmailDestination VPC=$VPC AZ=$AZ Subnet=$Subnet
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \ 
-            --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
       - run: cat .circleci/ansible/inventory.txt
       - run: pwd
       - persist_to_workspace:
@@ -586,7 +586,7 @@ jobs:
             fi
       - slack_notification_failed
       - slack_notification_succeeded
-  
+
   add-prometheus-node-exporter:
     docker:
       - image: python:3.7-alpine3.16
