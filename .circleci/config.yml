@@ -351,8 +351,8 @@ jobs:
               --capabilities CAPABILITY_IAM \
               --tags project=udapeople-prometheus \
               --stack-name "prometheus" \
-              --parameter-overrides AuthEmail=${GmailAddress} EmailPassword=${GmailPassword} \ 
-              FromEmail=${GmailAddress} ToEmail=${EmailDestination} VPC=${VPC} AZ=${AZ} Subnet=${Subnet}"
+              --parameter-overrides AuthEmail=$GmailAddress EmailPassword=$GmailPassword \ 
+              FromEmail=$GmailAddress ToEmail=$EmailDestination VPC=$VPC AZ=$AZ Subnet=$Subnet"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
