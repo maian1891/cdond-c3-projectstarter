@@ -354,7 +354,7 @@ jobs:
             aws cloudformation deploy \
               --template-file ./.circleci/files/prometheus.yml \
               --capabilities CAPABILITY_IAM \
-              --tags project=udapeople \
+              --tags project=udapeople-backend \
               --stack-name "udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides AuthEmail=$GmailAddress EmailPassword=$GmailPassword FromEmail=$GmailAddress ToEmail=$EmailDestination VPC=$VPC AZ=$AZ Subnet=$Subnet
       - run: cat .circleci/ansible/inventory.txt
@@ -453,7 +453,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
