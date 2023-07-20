@@ -349,8 +349,8 @@ jobs:
             aws cloudformation deploy \
               --template-file ./.circleci/files/prometheus.yml \
               --capabilities CAPABILITY_IAM \
-              --tags project=udapeople-prometheus \
-              --stack-name "prometheus" \
+              --tags project=udapeople \
+              --stack-name "udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides AuthEmail=$GmailAddress EmailPassword=$GmailPassword FromEmail=$GmailAddress ToEmail=$EmailDestination VPC=$VPC AZ=$AZ Subnet=$Subnet
       - run:
           name: Add back-end ip to ansible inventory
@@ -582,7 +582,7 @@ jobs:
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "udapeople-prometheus"
+              aws cloudformation delete-stack --stack-name "udapeople-prometheus-${OldWorkflowID}"
             fi
       - slack_notification_failed
       - slack_notification_succeeded
