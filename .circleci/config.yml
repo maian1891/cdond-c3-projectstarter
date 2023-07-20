@@ -351,8 +351,7 @@ jobs:
               --capabilities CAPABILITY_IAM \
               --tags project=udapeople-prometheus \
               --stack-name "prometheus" \
-              --parameter-overrides AuthEmail="${GmailAddress}" EmailPassword="${GmailPassword}" \ 
-              FromEmail="${GmailAddress}" ToEmail="${EmailDestination}" VPC="${VPC}" AZ="${AZ}" Subnet="${Subnet}"
+              --parameter-overrides AuthEmail=$GmailAddress EmailPassword=$GmailPassword FromEmail=$GmailAddress ToEmail=$EmailDestination VPC=$VPC AZ=$AZ Subnet=$Subnet
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -583,6 +582,7 @@ jobs:
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-prometheus"
             fi
       - slack_notification_failed
       - slack_notification_succeeded
