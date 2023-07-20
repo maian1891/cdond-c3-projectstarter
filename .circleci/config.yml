@@ -206,7 +206,7 @@ commands:
           aws-region: AWS_DEFAULT_REGION
 
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    description: Destroy back-end, front-end and prometheus cloudformation stacks given a workflow ID.
     steps:
       - run:
           name: Destroy environments
@@ -214,6 +214,7 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws cloudformation delete-stack --stack-name "udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7}"
 
   clean-s3:
     description: Clean all s3 files
@@ -346,7 +347,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \ 
+            aws ec2 describe-instances --filters "Name=tag:Name,Values=udapeople" \ 
             --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
       - run:
           name: Ensure prometheus infrastructure exist
