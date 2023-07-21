@@ -354,7 +354,7 @@ jobs:
             aws cloudformation deploy \
               --template-file ./.circleci/files/prometheus.yml \
               --capabilities CAPABILITY_IAM \
-              --tags project=udapeople-backend \
+              --tags project=udapeople-prometheus \
               --stack-name "udapeople-prometheus-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides AuthEmail=$GmailAddress EmailPassword=$GmailPassword FromEmail=$GmailAddress ToEmail=$EmailDestination VPC=$VPC AZ=$AZ Subnet=$Subnet
       - run: cat .circleci/ansible/inventory.txt
