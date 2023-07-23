@@ -388,7 +388,7 @@ jobs:
           name: Configure server
           command: |
             #add environment variables to server
-            # echo NODE_ENV=production > backend/.env
+            NODE_ENV=local
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
             echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> backend/.env
@@ -559,7 +559,7 @@ jobs:
              aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --stack-name "InitialStack" \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
             echo ${OldWorkflowID} >> oldWorkflowId.txt
             pwd
